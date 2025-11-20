@@ -1,0 +1,106 @@
+<div class="w-1/2 mx-auto">
+  <h1 class="text-3xl font-bold my-4 text-center">
+    Interplanetary Fuel Calculator
+  </h1>
+
+  <.form for={%{}} phx-change="update">
+    <div class="form-control w-full max-w-xs space-y-2">
+      <label class="label">
+        <span class="label-text text-lg font-semibold text-white">Spacecraft mass</span>
+      </label>
+
+      <div class="relative w-full">
+        <input
+          type="text"
+          name="mass"
+          value={@mass}
+          class={[
+            "input input-bordered w-full pr-12",
+            if(@errors[:mass], do: "input-error", else: "")
+          ]}
+          placeholder="Enter mass"
+          phx-debounce="500"
+          autocomplete="off"
+          autofocus
+        />
+
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-base-content opacity-70 pointer-events-none">
+          kg
+        </span>
+      </div>
+
+      <%= if @errors[:mass] do %>
+        <label class="label">
+          <span class="label-text-alt text-error">{@errors[:mass]}</span>
+        </label>
+      <% end %>
+    </div>
+
+    <div class="mt-8 space-y-2">
+      <label class="label">
+        <span class="label-text text-lg font-semibold text-white">Flight path</span>
+      </label>
+      <h2 class="text-xl font-semibold"></h2>
+
+      <div class="space-y-2">
+        <%= for step <- @steps do %>
+          <div id={"step-#{step.id}"} class="flex items-center gap-3 w-full">
+            <input type="hidden" name={"steps[#{step.id}][id]"} value={step.id} />
+
+            <select
+              name={"steps[#{step.id}][directive]"}
+              class="select select-bordered w-32"
+            >
+              <option value="launch" selected={step.directive == "launch"}>Launch</option>
+              <option value="land" selected={step.directive == "land"}>Land</option>
+            </select>
+
+            <select
+              name={"steps[#{step.id}][planet]"}
+              class="select select-bordered w-32"
+            >
+              <option value="earth" selected={step.planet == "earth"}>Earth</option>
+              <option value="moon" selected={step.planet == "moon"}>Moon</option>
+              <option value="mars" selected={step.planet == "mars"}>Mars</option>
+            </select>
+
+            <button
+              type="button"
+              phx-click="remove_step"
+              phx-value-id={step.id}
+              class="btn btn-error btn-sm"
+            >
+              Remove
+            </button>
+          </div>
+        <% end %>
+      </div>
+
+      <button
+        type="button"
+        phx-click="add_step"
+        class="btn btn-primary btn-sm"
+      >
+        Add step
+      </button>
+    </div>
+  </.form>
+
+  <div class="mt-8 space-y-2">
+    <h2 class="text-lg font-semibold text-white">Result</h2>
+
+    <%= if @fuel_needed do %>
+      <div class="alert alert-success w-fit">
+        <span>
+          Total required fuel: <span class="font-bold">{@fuel_needed}</span> kg
+        </span>
+      </div>
+    <% else %>
+      <div class="alert alert-info w-fit">
+        <span>
+          Enter valid mass and configure your flight path to see the required fuel.
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>
